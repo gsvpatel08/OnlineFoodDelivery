@@ -1,6 +1,8 @@
 ﻿
 
 
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using OnlineFoodDelivery.Data;
 using OnlineFoodDelivery.Module;
 using OnlineFoodDelivery.Repository;
@@ -12,41 +14,47 @@ using System.Net.Mail;
 
 
 public class UserService : IUserService
+{
+    private readonly IUserRepository _userRepository;
+    private readonly JwtHelper _jwtHelper;
+    private readonly IEmailService _emailService;
+    private readonly IMapper _mapper;
+
+    public UserService(IUserRepository userRepository, JwtHelper jwtHelper, IEmailService emailService, IMapper mapper)
     {
-        private readonly IUserRepository _userRepository;
-        private readonly JwtHelper _jwtHelper;
-        private readonly IEmailService _emailService;
+        _userRepository = userRepository;
+        _jwtHelper = jwtHelper;
+        _emailService = emailService;
+        _mapper = mapper;
+    }
 
-        public UserService(IUserRepository userRepository, JwtHelper jwtHelper, IEmailService emailService)
+    public async Task<ServiceResponse<string>> RegisterAsync(RegisterUserDto registerDto)
+    {
+        try
         {
-            _userRepository = userRepository;
-            _jwtHelper = jwtHelper;
-            _emailService = emailService;
-        }
-
-        public async Task<ServiceResponse<string>> RegisterAsync(RegisterUserDto registerDto)
-        {
-            var existingUser = await _userRepository.GetUserByUsernameAsync(registerDto.Username);
-            if (existingUser != null)
+            var existingUserName = await _userRepository.GetUserByUsernameAsync(registerDto.Username);
+            var existingUsereamil = await _userRepository.GetUserByEmailAsync(registerDto.Email);
+            if (existingUserName != null || existingUsereamil != null)
             {
                 return new ServiceResponse<string>
                 {
                     Success = false,
-                    Message = "Username already exists"
+                    Message = "Username or eamil already exists"
                 };
             }
-
-            var user = new User
-            {
-                FullName = registerDto.FullName,
-                Username = registerDto.Username,
-                Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-                Email = registerDto.Email,
-                Address = registerDto.Address,
-                Phone = registerDto.Phone,
-                CreatedDate = DateTime.UtcNow,
-                DOB = registerDto.DOB
-            };
+             var user = _mapper.Map<User>(registerDto);
+            user.Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
+            //var user = new User
+            //{
+            //    FullName = registerDto.FullName,
+            //    Username = registerDto.Username,
+            //    Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
+            //    Email = registerDto.Email,
+            //    Address = registerDto.Address,
+            //    Phone = registerDto.Phone,
+            //    CreatedDate = DateTime.UtcNow,
+            //    DOB = registerDto.DOB
+            //};
 
             await _userRepository.AddUserAsync(user);
             await _userRepository.SaveChangesAsync();
@@ -57,8 +65,33 @@ public class UserService : IUserService
                 Message = "Registration successful"
             };
         }
+        catch (DbUpdateException ex)
+        {
 
-        public async Task<ServiceResponse<string>> LoginAsync(LoginDto loginDto)
+            Console.WriteLine($"Database Update Error: {ex.Message}");
+
+            return new ServiceResponse<string>
+            {
+                Success = false,
+                Message = "A database error occurred while registering the user. Please try again later."
+            };
+        }
+        catch (Exception ex)
+        {
+
+            Console.WriteLine($"Unexpected Error: {ex.Message}");
+
+            return new ServiceResponse<string>
+            {
+                Success = false,
+                Message = "An unexpected error occurred. Please try again later."
+            };
+        }
+    }
+
+    public async Task<ServiceResponse<string>> LoginAsync(LoginDto loginDto)
+    {
+        try
         {
             var user = await _userRepository.GetUserByUsernameAsync(loginDto.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
@@ -79,19 +112,32 @@ public class UserService : IUserService
                 Data = token
             };
         }
+        catch (Exception ex)
+        {
 
-        public async Task<ServiceResponse<string>> ForgotPasswordAsync(string email)
+            Console.WriteLine($"Unexpected Error: {ex.Message}");
+
+            return new ServiceResponse<string>
+            {
+                Success = false,
+                Message = "An unexpected error occurred. Please try again later."
+            };
+        }
+    }
+    public async Task<ServiceResponse<string>> ForgotPasswordAsync(string email)
+    {
+        try
         {
             var user = await _userRepository.GetUserByEmailAsync(email);
             if (user == null)
             {
-            return new ServiceResponse<string>
-            {
-                Success = false,
-                Message = "Email not found",
+                return new ServiceResponse<string>
+                {
+                    Success = false,
+                    Message = "Email not found",
 
 
-            };
+                };
             }
 
             var resetToken = _jwtHelper.GenerateResetToken(user);
@@ -104,43 +150,66 @@ public class UserService : IUserService
                 Data = resetToken
             };
         }
+        catch (Exception ex)
+        {
 
+            Console.WriteLine($"Unexpected Error: {ex.Message}");
+
+            return new ServiceResponse<string>
+            {
+                Success = false,
+                Message = "An unexpected error occurred. Please try again later."
+            };
+        }
+    }
     public async Task<ServiceResponse<string>> ResetPasswordAsync(string token, string username, string newPassword)
     {
-        // Validate the token
-        var isTokenValid = await _jwtHelper.ValidateResetTokenAsync(token);
-        if (!isTokenValid)
+        try
+        { // Validate the token
+            var isTokenValid = await _jwtHelper.ValidateResetTokenAsync(token);
+            if (!isTokenValid)
+            {
+                return new ServiceResponse<string>
+                {
+                    Success = false,
+                    Message = "Invalid token"
+                };
+            }
+
+            // Retrieve the user by username
+            var user = await _userRepository.GetUserByUsernameAsync(username);
+            if (user == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    Success = false,
+                    Message = "User not found"
+                };
+            }
+
+            // Update the user's password
+            user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            await _userRepository.UpdateUserAsync(user);
+            await _userRepository.SaveChangesAsync();
+
+            return new ServiceResponse<string>
+            {
+                Success = true,
+                Message = "Password reset successful"
+            };
+        }
+        catch (Exception ex)
         {
+
+            Console.WriteLine($"Unexpected Error: {ex.Message}");
+
             return new ServiceResponse<string>
             {
                 Success = false,
-                Message = "Invalid token"
+                Message = "An unexpected error occurred. Please try again later."
             };
+
+
         }
-
-        // Retrieve the user by username
-        var user = await _userRepository.GetUserByUsernameAsync(username);
-        if (user == null)
-        {
-            return new ServiceResponse<string>
-            {
-                Success = false,
-                Message = "User not found"
-            };
-        }
-
-        // Update the user's password
-        user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
-        await _userRepository.UpdateUserAsync(user);
-        await _userRepository.SaveChangesAsync();
-
-        return new ServiceResponse<string>
-        {
-            Success = true,
-            Message = "Password reset successful"
-        };
     }
-
-  
 }
-

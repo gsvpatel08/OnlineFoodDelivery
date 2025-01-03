@@ -20,12 +20,12 @@ builder.Services.AddDbContext<OnlineFoodDeliveryDB>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<OnlineFoodDeliveryDB,OnlineFoodDeliveryDB>();
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<OnlineFoodDelivery.Utility.JwtHelper>();
 builder.Services.AddScoped<OnlineFoodDelivery.Utility.IEmailService, EmailService>();
 builder.Services.AddTransient<EmailService>();
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
