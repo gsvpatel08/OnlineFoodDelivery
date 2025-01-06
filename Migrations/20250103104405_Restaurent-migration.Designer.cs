@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineFoodDelivery.Data;
 
@@ -11,9 +12,11 @@ using OnlineFoodDelivery.Data;
 namespace OnlineFoodDelivery.Migrations
 {
     [DbContext(typeof(OnlineFoodDeliveryDB))]
-    partial class OnlineFoodDeliveryDBModelSnapshot : ModelSnapshot
+    [Migration("20250103104405_Restaurent-migration")]
+    partial class Restaurentmigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,7 +63,7 @@ namespace OnlineFoodDelivery.Migrations
 
                     b.HasKey("OwnerID");
 
-                    b.ToTable("RestaurantOwnerInfo", (string)null);
+                    b.ToTable("RestaurantOwnerInfo");
                 });
 
             modelBuilder.Entity("OnlineFoodDelivery.Module.User", b =>
@@ -108,7 +111,7 @@ namespace OnlineFoodDelivery.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }

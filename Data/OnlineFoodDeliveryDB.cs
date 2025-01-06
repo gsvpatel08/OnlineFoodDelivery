@@ -10,6 +10,11 @@ namespace OnlineFoodDelivery.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<RestaurentOwner> RestaurantOwnerInfo { get; set; }
+        public DbSet<RestaurantInformations> RestaurantDetails { get; set; }
+
+
+
     }
 
 }

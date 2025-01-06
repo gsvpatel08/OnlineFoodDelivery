@@ -57,7 +57,6 @@ public class UserService : IUserService
             //};
 
             await _userRepository.AddUserAsync(user);
-            await _userRepository.SaveChangesAsync();
 
             return new ServiceResponse<string>
             {
@@ -103,12 +102,12 @@ public class UserService : IUserService
                 };
             }
 
-            var token = _jwtHelper.GenerateToken(user);
+            var token = _jwtHelper.GenerateToken(user : user,restaurentOwner :null);
 
             return new ServiceResponse<string>
             {
                 Success = true,
-                Message = "Login successful",
+                Message = "Login successfully",
                 Data = token
             };
         }

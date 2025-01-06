@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using OnlineFoodDelivery.Data;
 using OnlineFoodDelivery.Repository;
 using OnlineFoodDelivery.Service;
+using OnlineFoodDelivery.Service.Interfaces;
 using OnlineFoodDelivery.Utility;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,12 +21,17 @@ builder.Services.AddDbContext<OnlineFoodDeliveryDB>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<OnlineFoodDeliveryDB,OnlineFoodDeliveryDB>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddScoped<OnlineFoodDelivery.Utility.JwtHelper>();
 builder.Services.AddScoped<OnlineFoodDelivery.Utility.IEmailService, EmailService>();
 builder.Services.AddTransient<EmailService>();
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddScoped<IRestaurentOwnerRepo, RestaurentOwnerRepository>();
+builder.Services.AddScoped<IRestaurentOwnerService, RestaurentOwnerService>();
+
+
+
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -39,6 +45,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"])),
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             ValidAudience = builder.Configuration["JwtSettings:Audience"]
+           
         };
     });
 

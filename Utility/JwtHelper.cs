@@ -4,7 +4,6 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using OnlineFoodDelivery.Module;
 
-
 namespace OnlineFoodDelivery.Utility
 {
     public class JwtHelper
@@ -14,19 +13,29 @@ namespace OnlineFoodDelivery.Utility
         public JwtHelper(IConfiguration configuration)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            
         }
 
-        public string GenerateToken(User user)
+        public string GenerateToken(User user = null, RestaurentOwner restaurentOwner = null)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-            if (string.IsNullOrEmpty(user.Username)) throw new ArgumentException("Username cannot be null or empty.", nameof(user.Username));
+            if (user == null && restaurentOwner == null)
+                throw new ArgumentNullException("Both user and restaurentOwner cannot be null.");
 
-            var claims = new[]
+            var claims = new List<Claim>();
+
+            if (user != null)
             {
-                new Claim(ClaimTypes.Name, user.Username),
-         
-            };
+                if (string.IsNullOrEmpty(user.Username))
+                    throw new ArgumentException("User's username cannot be null or empty.", nameof(user.Username));
+
+                claims.Add(new Claim(ClaimTypes.Name, user.Username));
+            }
+            else if (restaurentOwner != null)
+            {
+                if (string.IsNullOrEmpty(restaurentOwner.UserName))
+                    throw new ArgumentException("Restaurant owner's username cannot be null or empty.", nameof(restaurentOwner.UserName));
+
+                claims.Add(new Claim(ClaimTypes.Name, restaurentOwner.UserName));
+            }
 
             var key = GetSymmetricSecurityKey("JwtSettings:Key");
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -35,7 +44,7 @@ namespace OnlineFoodDelivery.Utility
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddSeconds(40),
                 signingCredentials: creds
             );
 
@@ -45,12 +54,11 @@ namespace OnlineFoodDelivery.Utility
         public string GenerateResetToken(User user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
-            if (string.IsNullOrEmpty(user.Email)) throw new ArgumentException("Username cannot be null or empty.", nameof(user.Email));
+            if (string.IsNullOrEmpty(user.Email)) throw new ArgumentException("Email cannot be null or empty.", nameof(user.Email));
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Email, user.Username),
-
+                new Claim(ClaimTypes.Email, user.Email),
             };
 
             var key = GetSymmetricSecurityKey("JwtSettings:Key");
@@ -60,17 +68,12 @@ namespace OnlineFoodDelivery.Utility
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddSeconds(40),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-
-
-
-
 
         public async Task<bool> ValidateResetTokenAsync(string token)
         {
@@ -82,35 +85,31 @@ namespace OnlineFoodDelivery.Utility
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
-                ValidateLifetime = true, 
+                ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidIssuer = _configuration["JwtSettings:Issuer"],
-                ValidAudience = _configuration["JwtSettings:Audience"]
+                ValidAudience = _configuration["JwtSettings:Audience"],
+                  ClockSkew = TimeSpan.Zero
             };
 
             try
             {
                 tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
 
-               
                 if (validatedToken is JwtSecurityToken jwtToken &&
                     jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return true; 
+                    return true;
                 }
 
-                return false; 
+                return false;
             }
             catch (Exception)
             {
-                return false; 
+                return false;
             }
         }
-
-
-
-
 
         private SymmetricSecurityKey GetSymmetricSecurityKey(string configKey)
         {
