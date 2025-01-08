@@ -34,9 +34,9 @@ namespace OnlineFoodDelivery.Controllers
             var response = await _orderService.DeleteOrderAsync(orderDeleteDto);
             if (response.Success)
             {
-                return BadRequest(response);
+                return NotFound(response);
             }
-            return Ok();
+            return Ok(response);
         }
     }
 }

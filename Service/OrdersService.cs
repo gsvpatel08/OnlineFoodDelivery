@@ -22,20 +22,21 @@ namespace OnlineFoodDelivery.Service
 
         public async Task<ServiceResponse<string>> DeleteOrderAsync(OrderDeleteDto orderDeleteDto)
         {
-            var orderId = await _ordersRepository.GetOrderByIDAsync(orderDeleteDto.Id);
-            if (orderId == null)
+            var orderId =   await _ordersRepository.GetOrderByIDAsync(orderDeleteDto.Id);
+            if (orderId != null)
             {
+                await _ordersRepository.DeleteOrdersAsync(orderId);
                 return new ServiceResponse<string>
                 {
-                    Success = false,
-                    Message = "OrderID is not found!"
+                    Success = true,
+                    Message = "Order is deleted successfully!"
                 };
             }
-            await _ordersRepository.DeleteOrdersAsync(orderId);
+         
             return new ServiceResponse<string>
             {
-                Success = true,
-                Message = "Order is deleted successfully!"
+                Success = false,
+                Message = "OrderId is not found"
 
             };
         }
