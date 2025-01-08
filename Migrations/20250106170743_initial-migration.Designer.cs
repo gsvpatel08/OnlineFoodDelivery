@@ -12,8 +12,8 @@ using OnlineFoodDelivery.Data;
 namespace OnlineFoodDelivery.Migrations
 {
     [DbContext(typeof(OnlineFoodDeliveryDB))]
-    [Migration("20250103104405_Restaurent-migration")]
-    partial class Restaurentmigration
+    [Migration("20250106170743_initial-migration")]
+    partial class initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,57 @@ namespace OnlineFoodDelivery.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("OnlineFoodDelivery.Module.Restaurant", b =>
+                {
+                    b.Property<int>("RestaurantID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RestaurantID"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeOnly>("ClosingTime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("OpeningTime")
+                        .HasColumnType("time");
+
+                    b.Property<int>("OwnerID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RestaurantEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RestaurantName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateOnly>("RestaurantOpenedDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("RestaurantPhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("restaurantRatings")
+                        .HasColumnType("int");
+
+                    b.HasKey("RestaurantID");
+
+                    b.HasIndex("OwnerID");
+
+                    b.ToTable("Restaurant");
+                });
 
             modelBuilder.Entity("OnlineFoodDelivery.Module.RestaurentOwner", b =>
                 {
@@ -63,7 +114,7 @@ namespace OnlineFoodDelivery.Migrations
 
                     b.HasKey("OwnerID");
 
-                    b.ToTable("RestaurantOwnerInfo");
+                    b.ToTable("RestaurentOwner");
                 });
 
             modelBuilder.Entity("OnlineFoodDelivery.Module.User", b =>
@@ -111,7 +162,18 @@ namespace OnlineFoodDelivery.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
+                });
+
+            modelBuilder.Entity("OnlineFoodDelivery.Module.Restaurant", b =>
+                {
+                    b.HasOne("OnlineFoodDelivery.Module.RestaurentOwner", "RestaurentOwnerId")
+                        .WithMany()
+                        .HasForeignKey("OwnerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RestaurentOwnerId");
                 });
 #pragma warning restore 612, 618
         }

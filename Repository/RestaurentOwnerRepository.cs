@@ -17,13 +17,13 @@ namespace OnlineFoodDelivery.Repository
 
         public async  Task AddRestaurentOwnerAsync(RestaurentOwner restaurentOwner)
         {
-             await _DbContext.RestaurantOwnerInfo.AddAsync(restaurentOwner);
+             await _DbContext.RestaurentOwner.AddAsync(restaurentOwner);
             await _DbContext.SaveChangesAsync();
         }
 
         public  Task<RestaurentOwner> GetRestaurentOwnerByEmailAsync(string email)
         {
-          return   _DbContext.RestaurantOwnerInfo.FirstOrDefaultAsync(e => e.email == email);
+          return   _DbContext.RestaurentOwner.FirstOrDefaultAsync(e => e.email == email);
             
         }
 
@@ -34,7 +34,7 @@ namespace OnlineFoodDelivery.Repository
 
         public  Task<RestaurentOwner> GetRestaurentOwnerByUsernameAsync(string username)
         {
-             return  _DbContext.RestaurantOwnerInfo.FirstOrDefaultAsync(u => u.UserName == username);
+             return  _DbContext.RestaurentOwner.FirstOrDefaultAsync(u => u.UserName == username);
 
         }
 

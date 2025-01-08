@@ -6,6 +6,8 @@ using Org.BouncyCastle.Asn1.Bsi;
 
 namespace OnlineFoodDelivery.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class RestaurentOwnerControllers : ControllerBase
     {
         private readonly IRestaurentOwnerService _restaurentOwnerService;

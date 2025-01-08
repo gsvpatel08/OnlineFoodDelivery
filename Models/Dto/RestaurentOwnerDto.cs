@@ -6,7 +6,6 @@ namespace OnlineFoodDelivery.Module.Dto
     public class RestaurentOwnerDto
     {
 
-      
 
         [Required(ErrorMessage = "Restaurent_OwnerName is required.")]
         [StringLength(40, MinimumLength = 3, ErrorMessage = "Restaurent_OwnerName must be grater than 3")]

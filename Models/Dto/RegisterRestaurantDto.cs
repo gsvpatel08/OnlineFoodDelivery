@@ -1,21 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using static OnlineFoodDelivery.Utility.Enums;
+﻿
+using System.ComponentModel.DataAnnotations;
 
-namespace OnlineFoodDelivery.Module
+namespace OnlineFoodDelivery.model.Dto
 {
-    public class RestaurantInformations
+    public class RegisterRestaurantDto
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int RestaurantID { get; set; }  // Primary Key
 
-        [ForeignKey("RestaurentOwner")]  // This specifies that OwnerID is a foreign key pointing to RestaurentOwner
-        public int OwnerID { get; set; } // Foreign Key to RestaurentOwner
+        [Required(ErrorMessage = "Token is required")]
+        public string Token { get; set; }
 
         [Required(ErrorMessage = "Restaurant name is required.")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Restaurant name must be between 3 and 100 characters.")]
         public string RestaurantName { get; set; }
+
 
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid email format.")]
@@ -25,9 +22,6 @@ namespace OnlineFoodDelivery.Module
         [RegularExpression(@"^\+?(\d{1,4})?[\s\-]?\(?\d{1,4}?\)?[\s\-]?\d{1,4}[\s\-]?\d{1,4}$", ErrorMessage = "Invalid phone number format.")]
         public string RestaurantPhone { get; set; }
 
-        [Required(ErrorMessage = "Ratings are required.")]
-        [Range(1, 5, ErrorMessage = "Ratings must be between 1 and 5.")]
-        public int RestaurantRatings { get; set; }  // Assuming Ratings is an integer (1-5)
 
         [Required(ErrorMessage = "Address is required.")]
         public string Address { get; set; }
@@ -41,9 +35,14 @@ namespace OnlineFoodDelivery.Module
         [Required(ErrorMessage = "Closing time is required.")]
         public TimeOnly ClosingTime { get; set; }
 
-        // Navigation Property for the relationship with RestaurentOwner
-        public RestaurantRatings RestaurentOwner { get; set; }
+        //[Required(ErrorMessage = "Ratings are required.")]
+        //[Range(1, 5, ErrorMessage = "Ratings must be between 1 and 5.")]
+        //public RestaurantRatings restaurantRatings { get; set; }
+
+
+
+        [Required (ErrorMessage = "OwnerId is required")]
+        public int OwnerID { get; set; }  // This column will store the foreign key
+
     }
-
 }
-

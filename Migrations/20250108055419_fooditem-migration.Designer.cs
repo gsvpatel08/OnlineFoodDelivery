@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineFoodDelivery.Data;
 
@@ -11,9 +12,11 @@ using OnlineFoodDelivery.Data;
 namespace OnlineFoodDelivery.Migrations
 {
     [DbContext(typeof(OnlineFoodDeliveryDB))]
-    partial class OnlineFoodDeliveryDBModelSnapshot : ModelSnapshot
+    [Migration("20250108055419_fooditem-migration")]
+    partial class fooditemmigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,56 +24,6 @@ namespace OnlineFoodDelivery.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("OnlineFoodDelivery.Models.Orders", b =>
-                {
-                    b.Property<int>("OrderID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderID"));
-
-                    b.Property<string>("DeliveryAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DeliveryStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ItemID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RestaurantID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalPrice")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderID");
-
-                    b.HasIndex("ItemID");
-
-                    b.HasIndex("RestaurantID");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Orders");
-                });
 
             modelBuilder.Entity("OnlineFoodDelivery.Module.Restaurant", b =>
                 {
@@ -279,33 +232,6 @@ namespace OnlineFoodDelivery.Migrations
                     b.HasIndex("Restaurantid");
 
                     b.ToTable("FoodItems");
-                });
-
-            modelBuilder.Entity("OnlineFoodDelivery.Models.Orders", b =>
-                {
-                    b.HasOne("OnlineFoodDelivery.model.FoodItems", "foodItems")
-                        .WithMany()
-                        .HasForeignKey("ItemID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OnlineFoodDelivery.Module.Restaurant", "restaurant")
-                        .WithMany()
-                        .HasForeignKey("RestaurantID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OnlineFoodDelivery.Module.User", "user")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("foodItems");
-
-                    b.Navigation("restaurant");
-
-                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("OnlineFoodDelivery.Module.Restaurant", b =>

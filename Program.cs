@@ -1,8 +1,11 @@
+using System.Reflection.Emit;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
 using OnlineFoodDelivery.Data;
+using OnlineFoodDelivery.model;
 using OnlineFoodDelivery.Repository;
 using OnlineFoodDelivery.Service;
 using OnlineFoodDelivery.Service.Interfaces;
@@ -28,9 +31,15 @@ builder.Services.AddTransient<EmailService>();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IRestaurentOwnerRepo, RestaurentOwnerRepository>();
 builder.Services.AddScoped<IRestaurentOwnerService, RestaurentOwnerService>();
-
-
-
+builder.Services.AddScoped<IRestaurentRepository,RestaurantRepository>();
+builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService , CategoryService>();
+builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
+builder.Services.AddScoped<IFoodItemsService, FoodItemService>();
+builder.Services.AddScoped<IOrderService, OrdersService>();
+builder.Services.AddScoped<IOrdersRepository, OrdersRepository>();
+        
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
