@@ -17,8 +17,8 @@ namespace OnlineFoodDelivery.Controllers
             _orderService = orderService;
         }
 
-        [HttpPost("RegisterOrder")]
-        public async Task<IActionResult> RegisterOrder(RegisterOrderDto registerOrderDto)
+        [HttpPost("PlaceOrder")]
+        public async Task<IActionResult> PlaceOrder(PlaceOrderDto registerOrderDto)
         {
             var response = await _orderService.RegisterOrdersAsync(registerOrderDto);
             if (!response.Success)
@@ -37,6 +37,24 @@ namespace OnlineFoodDelivery.Controllers
                 return NotFound(response);
             }
             return Ok(response);
+        }
+
+        [HttpGet("GetOrdersByRestaurantName")]
+        public async Task<IActionResult> GetOrdersByRestaurantName(string restaurantName)
+        {
+            if (string.IsNullOrEmpty(restaurantName))
+            {
+                return BadRequest("Restaurant name is required.");
+            }
+
+            var responses = await _orderService.GetOrdersByRestaurantName(restaurantName);
+
+            if (responses.All(r => !r.Success))
+            {
+                return NotFound(responses.First().Message);
+            }
+
+            return Ok(responses);
         }
     }
 }

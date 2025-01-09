@@ -40,7 +40,59 @@ namespace OnlineFoodDelivery.Service
 
             };
         }
-        public async Task<ServiceResponse<string>> RegisterOrdersAsync(RegisterOrderDto registerOrderDto)
+
+        public async Task<List<ServiceResponse<string>>> GetOrdersByRestaurantName(string restaurantName)
+        {
+            var response = new List<ServiceResponse<string>>();
+
+            // Fetch all restaurants and orders
+            var restaurants = await Task.Run(() => _ordersRepository.GetAllRestaurants());
+            var orders = await Task.Run(() => _ordersRepository.GetAllOrders());
+
+            // Find the restaurant by name
+            var restaurant = restaurants.FirstOrDefault(r => r.RestaurantName == restaurantName);
+
+            if (restaurant == null)
+            {
+                response.Add(new ServiceResponse<string>
+                {
+                    Success = false,
+                    Message = "Restaurant not found.",
+                    Data = null
+                });
+
+                return response;
+            }
+
+            // Get orders for the matching restaurant ID
+            var filteredOrders = orders.Where(o => o.RestaurantID == restaurant.RestaurantID).ToList();
+
+            if (!filteredOrders.Any())
+            {
+                response.Add(new ServiceResponse<string>
+                {
+                    Success = false,
+                    Message = "No orders found for the given restaurant.",
+                    Data = null
+                });
+            }
+            else
+            {
+                response.AddRange(filteredOrders.Select(order => new ServiceResponse<string>
+                {
+                    Success = true,
+                    Message = "Order retrieved successfully.",
+                    Data = $"Order ID: {order.OrderID}"
+                }));
+            }
+
+            return response;
+        }
+
+
+        
+
+        public async Task<ServiceResponse<string>> RegisterOrdersAsync(PlaceOrderDto registerOrderDto)
         {
             try
             {

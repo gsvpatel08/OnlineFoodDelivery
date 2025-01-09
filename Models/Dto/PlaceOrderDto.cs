@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineFoodDelivery.Models.Dto
 {
-    public class RegisterOrderDto
+    public class PlaceOrderDto
     {
 
        

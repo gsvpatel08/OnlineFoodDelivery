@@ -4,10 +4,12 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OnlineFoodDelivery.Data;
+using OnlineFoodDelivery.model;
 using OnlineFoodDelivery.Module;
 using OnlineFoodDelivery.Repository;
 using OnlineFoodDelivery.Service;
 using OnlineFoodDelivery.Utility;
+using OnlineFoodDelivery.Utility.ApiResponses;
 using Org.BouncyCastle.Crypto.Generators;
 using System.Net.Mail;
 
@@ -42,7 +44,7 @@ public class UserService : IUserService
                     Message = "Username or eamil already exists"
                 };
             }
-             var user = _mapper.Map<User>(registerDto);
+            var user = _mapper.Map<User>(registerDto);
             user.Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
             //var user = new User
             //{
@@ -102,7 +104,7 @@ public class UserService : IUserService
                 };
             }
 
-            var token = _jwtHelper.GenerateToken(user : user,restaurentOwner :null);
+            var token = _jwtHelper.GenerateToken(user: user, restaurentOwner: null);
 
             return new ServiceResponse<string>
             {
@@ -211,4 +213,65 @@ public class UserService : IUserService
 
         }
     }
+
+    public async Task<List<ServiceResponse<RestaurentFoodItemListApiResponse>>> GetFoodItemsByRestaurantNameAsync(string restaurantName)
+    {
+
+        var response = new List<ServiceResponse<RestaurentFoodItemListApiResponse>>();
+
+        // Fetch all restaurants and food items
+        var restaurants = await Task.Run(() => _userRepository.GetAllRestaurantsAsync());
+        var foodItems = await Task.Run(() => _userRepository.GetAllFoodItemsAsync());
+
+        // Find the restaurant by name
+        var restaurant = restaurants.FirstOrDefault(r => r.RestaurantName == restaurantName);
+
+        if (restaurant == null)
+        {
+            response.Add(new ServiceResponse<RestaurentFoodItemListApiResponse>
+            {
+                Success = false,
+                Message = "Restaurant not found.",
+                Data = null
+            });
+
+            return response;
+        }
+
+        // Filter food items by restaurant ID
+        var filteredFoodItems = foodItems
+            .Where(f => f.Restaurantid == restaurant.RestaurantID)
+            .Select(f => new RestaurentFoodItemListApiResponse
+            {
+                RestaurantName = restaurant.RestaurantName,
+                RestaurantId = restaurant.RestaurantID,
+                ItemName = f.ItemName,
+                ItemId = f.ItemID,
+                Price = f.Price
+            })
+            .ToList();
+
+        if (!filteredFoodItems.Any())
+        {
+            response.Add(new ServiceResponse<RestaurentFoodItemListApiResponse>
+            {
+                Success = false,
+                Message = "No food items found for the given restaurant.",
+                Data = null
+            });
+        }
+        else
+        {
+            response.AddRange(filteredFoodItems.Select(foodItem => new ServiceResponse<RestaurentFoodItemListApiResponse>
+            {
+                Success = true,
+                Message = "Food item retrieved successfully.",
+                Data = foodItem
+            }));
+        }
+
+        return response;
+    }
+
+  
 }

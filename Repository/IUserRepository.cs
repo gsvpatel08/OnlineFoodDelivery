@@ -1,4 +1,5 @@
-﻿using OnlineFoodDelivery.Module;
+﻿using OnlineFoodDelivery.model;
+using OnlineFoodDelivery.Module;
 
 namespace OnlineFoodDelivery.Repository
 {
@@ -10,6 +11,13 @@ namespace OnlineFoodDelivery.Repository
             Task AddUserAsync(User user);
             Task UpdateUserAsync(User user);
             Task SaveChangesAsync();
-        }
+
+        
+            List<Restaurant> GetAllRestaurantsAsync();
+            List<FoodItems> GetAllFoodItemsAsync();
+        
+
+
     }
+}
 

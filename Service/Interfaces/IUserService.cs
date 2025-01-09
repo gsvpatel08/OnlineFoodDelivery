@@ -1,6 +1,8 @@
 ﻿using OnlineFoodDelivery.Data;
+using OnlineFoodDelivery.model;
 using OnlineFoodDelivery.Module;
 using OnlineFoodDelivery.Utility;
+using OnlineFoodDelivery.Utility.ApiResponses;
 
 namespace OnlineFoodDelivery.Service
 {
@@ -11,5 +13,14 @@ namespace OnlineFoodDelivery.Service
             Task<ServiceResponse<string>> LoginAsync(LoginDto loginDto);
             Task<ServiceResponse<string>> ForgotPasswordAsync(string email);
             Task<ServiceResponse<string>> ResetPasswordAsync(string token, string newPassword, string username);
-        }
+
+
+        
+            Task<List<ServiceResponse<RestaurentFoodItemListApiResponse>>> GetFoodItemsByRestaurantNameAsync(string restaurantName);
+        
+
+
+
+
     }
+}

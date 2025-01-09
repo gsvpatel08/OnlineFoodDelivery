@@ -1,4 +1,5 @@
 ﻿using OnlineFoodDelivery.Models;
+using OnlineFoodDelivery.Module;
 
 namespace OnlineFoodDelivery.Repository
 {
@@ -10,5 +11,7 @@ namespace OnlineFoodDelivery.Repository
         Task DeleteOrdersAsync(Orders orders);
 
         Task<Orders> GetOrderByIDAsync(int OrderID);
+        List<Orders> GetAllOrders();
+        List<Restaurant> GetAllRestaurants();
     }
 }

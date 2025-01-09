@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using OnlineFoodDelivery.Data;
+using OnlineFoodDelivery.model;
 using OnlineFoodDelivery.Module;
 
 namespace OnlineFoodDelivery.Repository
@@ -43,6 +44,14 @@ namespace OnlineFoodDelivery.Repository
                 await _context.SaveChangesAsync();
             }
 
-    
+        public List<Restaurant> GetAllRestaurantsAsync()
+        {
+           return _context.Restaurant.ToList();
+        }
+
+        public List<FoodItems> GetAllFoodItemsAsync()
+        {
+            return _context.FoodItems.ToList();
+        }
     }
     }

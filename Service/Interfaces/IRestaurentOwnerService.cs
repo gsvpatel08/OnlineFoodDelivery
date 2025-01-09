@@ -11,5 +11,6 @@ namespace OnlineFoodDelivery.Service.Interfaces
         Task<ServiceResponse<string>> LoginRestaurentOwnerAsync(LoginDto loginDto);
 
 
+
     }
 }

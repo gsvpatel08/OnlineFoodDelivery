@@ -3,6 +3,7 @@ using OnlineFoodDelivery.Data;
 using OnlineFoodDelivery.Module;
 using OnlineFoodDelivery.Module.Dto;
 using OnlineFoodDelivery.Service;
+using OnlineFoodDelivery.Service.Interfaces;
 
 namespace OnlineFoodDelivery.Controllers
 {
@@ -57,6 +58,23 @@ namespace OnlineFoodDelivery.Controllers
             return Ok(response);
         }
 
-    }
+        [HttpGet("GetFoodItemsByRestaurantName")]
+        public async Task<IActionResult> GetFoodItemsByRestaurantName(string restaurantName)
+        {
+            if (string.IsNullOrEmpty(restaurantName))
+            {
+                return BadRequest("Restaurant name is required.");
+            }
 
+            var responses = await _userService.GetFoodItemsByRestaurantNameAsync(restaurantName);
+
+            if (responses.All(r => !r.Success))
+            {
+                return NotFound(responses.First().Message);
+            }
+
+            return Ok(responses);
+        }
+
+    }
 }
