@@ -9,6 +9,9 @@ namespace OnlineFoodDelivery.Service.Interfaces
         Task<List<FoodCategory>> GetFoodCategoriesAsync(); 
 
         Task<FoodCategory> GetCategoryByCategoryNameAsync(string categoryName);
+        
+
+
 
     }
 }

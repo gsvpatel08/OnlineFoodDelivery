@@ -15,7 +15,10 @@ namespace OnlineFoodDelivery.Repository
         
             List<Restaurant> GetAllRestaurantsAsync();
             List<FoodItems> GetAllFoodItemsAsync();
-        
+
+        Task<List<FoodCategory>> GetFoodCategoriesWithItemsAsync();
+
+
 
 
     }

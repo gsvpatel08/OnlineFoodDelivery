@@ -76,5 +76,20 @@ namespace OnlineFoodDelivery.Controllers
             return Ok(responses);
         }
 
+        [HttpGet("GetFoodCategoriesWithItems")]
+        public async Task<IActionResult> GetFoodCategoriesWithItems()
+        {
+            var result = await _userService.GetFoodCategoriesWithItemsAsync();
+
+            if (result.All(r => !r.Success))
+            {
+                return NotFound(result.First().Message);
+            }
+
+            return Ok(result.Select(r => r.Data));
+
+
+
+        }
     }
 }

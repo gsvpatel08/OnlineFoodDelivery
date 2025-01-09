@@ -53,5 +53,13 @@ namespace OnlineFoodDelivery.Repository
         {
             return _context.FoodItems.ToList();
         }
+
+        public async Task<List<FoodCategory>> GetFoodCategoriesWithItemsAsync()
+        {
+            return await _context.FoodCategory
+                           .Include(c => c.FoodItems)
+                           .ToListAsync();
+
+        }
     }
     }

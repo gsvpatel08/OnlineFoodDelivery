@@ -61,6 +61,7 @@ namespace OnlineFoodDelivery.Service
                 }
 
 
+
                 var restaurentOwner = _mapper.Map<RestaurentOwner>(restaurentOwnerDto);
                 restaurentOwner.Password = BCrypt.Net.BCrypt.HashPassword(restaurentOwnerDto.Password);
 
@@ -69,7 +70,8 @@ namespace OnlineFoodDelivery.Service
                 return new ServiceResponse<string>
                 {
                     Success = true,
-                    Message = " Restaurent Member add succesfully"
+                    Message = $"Restaurant Member added successfully! <strong>and below showing number is your Owner_id please note done</strong>",
+                    Data = restaurentOwner.OwnerID.ToString()
                 };
 
             }

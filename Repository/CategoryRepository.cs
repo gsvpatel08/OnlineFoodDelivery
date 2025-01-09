@@ -14,6 +14,7 @@ namespace OnlineFoodDelivery.Repository
             _Dbcontext = onlineFoodDeliveryDB;
         }
 
+       
         public async  Task<FoodCategory> GetCategoryByCategoryNameAsync(string categoryName)
         {
            return  await _Dbcontext.FoodCategory.FirstOrDefaultAsync(c =>  c.CategoryName == categoryName);

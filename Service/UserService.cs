@@ -273,5 +273,49 @@ public class UserService : IUserService
         return response;
     }
 
-  
+    public async Task<List<ServiceResponse<FoodCategoryResponse>>> GetFoodCategoriesWithItemsAsync()
+    {
+        var response = new List<ServiceResponse<FoodCategoryResponse>>();
+
+        // Fetch all food categories along with their food items
+        var foodCategories = await _userRepository.GetFoodCategoriesWithItemsAsync();
+
+        if (foodCategories == null || !foodCategories.Any())
+        {
+            return new List<ServiceResponse<FoodCategoryResponse>>()
+            {
+                new ServiceResponse<FoodCategoryResponse>
+                {
+                    Success = false,
+                    Message = "No food categories found.",
+                    Data = null
+                }
+            };
+        }
+
+        // Create a response for each category with its items
+        foreach (var category in foodCategories)
+        {
+            var categoryResponse = new FoodCategoryResponse
+            {
+                CategoryId = category.CategoryId,
+                CategoryName = category.CategoryName,
+                Items = category.FoodItems.Select(item => new FoodItemResponse
+                {
+                    ItemId = item.ItemID,
+                    ItemName = item.ItemName,
+                    Price = item.Price
+                }).ToList()
+            };
+
+            response.Add(new ServiceResponse<FoodCategoryResponse>
+            {
+                Success = true,
+                Message = "Food categories and items retrieved successfully.",
+                Data = categoryResponse
+            });
+        }
+
+        return response;
+    }
 }

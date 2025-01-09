@@ -18,5 +18,7 @@ namespace OnlineFoodDelivery.model
         public Restaurant restaurant01  { get; set; }
 
         public string Description { get; set; } = string.Empty;
+
+        public List<FoodItems> FoodItems { get; set; }
     }
 }

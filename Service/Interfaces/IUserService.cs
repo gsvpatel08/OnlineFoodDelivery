@@ -17,10 +17,14 @@ namespace OnlineFoodDelivery.Service
 
         
             Task<List<ServiceResponse<RestaurentFoodItemListApiResponse>>> GetFoodItemsByRestaurantNameAsync(string restaurantName);
-        
 
-
-
-
+        Task<List<ServiceResponse<FoodCategoryResponse>>> GetFoodCategoriesWithItemsAsync();
     }
+
+
+
+
+
+
 }
+
