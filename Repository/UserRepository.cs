@@ -37,6 +37,8 @@ namespace OnlineFoodDelivery.Repository
             public async Task UpdateUserAsync(User user)
             {
                 _context.User.Update(user);
+            _context.SaveChangesAsync();
+
             }
 
             public async Task SaveChangesAsync()
@@ -60,6 +62,11 @@ namespace OnlineFoodDelivery.Repository
                            .Include(c => c.FoodItems)
                            .ToListAsync();
 
+        }
+
+        public async Task<User> GetUserByIDAsync(int id)
+        {
+            return  _context.User.FirstOrDefault(u => u.UserId == id);
         }
     }
     }

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using OnlineFoodDelivery.Data;
+using OnlineFoodDelivery.Models.Dto;
 using OnlineFoodDelivery.Module;
 using OnlineFoodDelivery.Module.Dto;
 using OnlineFoodDelivery.Service;
@@ -84,6 +86,7 @@ namespace OnlineFoodDelivery.Controllers
             if (result.All(r => !r.Success))
             {
                 return NotFound(result.First().Message);
+                
             }
 
             return Ok(result.Select(r => r.Data));
@@ -91,5 +94,29 @@ namespace OnlineFoodDelivery.Controllers
 
 
         }
-    }
-}
+        [HttpGet("GetAllRestaurantNames")]
+        public async Task<IActionResult> GetAllRestaurantNames()
+        {
+            var response = await _userService.GetAllRestaurantsNamesAsync();
+            if (response.All(r => !r.Success))
+            {
+                return NotFound(response.First().Message);
+            }
+            return Ok(response.Select(r => r.Data));
+        }
+
+
+
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> UpdateUser(UserUpdateDto userUpdateDto)
+        {
+            var response = await _userService.UpdateUser(userUpdateDto);
+
+            if (response.Success)
+            {
+                return NotFound(response);
+
+            }
+            return Ok(response);
+        }
+    }  }

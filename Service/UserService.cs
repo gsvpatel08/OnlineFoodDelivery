@@ -5,6 +5,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OnlineFoodDelivery.Data;
 using OnlineFoodDelivery.model;
+using OnlineFoodDelivery.Models.Dto;
 using OnlineFoodDelivery.Module;
 using OnlineFoodDelivery.Repository;
 using OnlineFoodDelivery.Service;
@@ -223,7 +224,6 @@ public class UserService : IUserService
         var restaurants = await Task.Run(() => _userRepository.GetAllRestaurantsAsync());
         var foodItems = await Task.Run(() => _userRepository.GetAllFoodItemsAsync());
 
-        // Find the restaurant by name
         var restaurant = restaurants.FirstOrDefault(r => r.RestaurantName == restaurantName);
 
         if (restaurant == null)
@@ -238,7 +238,6 @@ public class UserService : IUserService
             return response;
         }
 
-        // Filter food items by restaurant ID
         var filteredFoodItems = foodItems
             .Where(f => f.Restaurantid == restaurant.RestaurantID)
             .Select(f => new RestaurentFoodItemListApiResponse
@@ -277,7 +276,6 @@ public class UserService : IUserService
     {
         var response = new List<ServiceResponse<FoodCategoryResponse>>();
 
-        // Fetch all food categories along with their food items
         var foodCategories = await _userRepository.GetFoodCategoriesWithItemsAsync();
 
         if (foodCategories == null || !foodCategories.Any())
@@ -293,7 +291,7 @@ public class UserService : IUserService
             };
         }
 
-        // Create a response for each category with its items
+        
         foreach (var category in foodCategories)
         {
             var categoryResponse = new FoodCategoryResponse
@@ -318,4 +316,77 @@ public class UserService : IUserService
 
         return response;
     }
-}
+
+    public async Task<List<ServiceResponse<string>>> GetAllRestaurantsNamesAsync()
+    {
+        var response = new List<ServiceResponse<string>>();
+
+        var restaurants = _userRepository.GetAllRestaurantsAsync();
+
+        if (restaurants == null || !restaurants.Any())
+        {
+
+            response.Add(new ServiceResponse<string>()
+            {
+
+                Success = false,
+                Message = "No Restaurants are found",
+                Data = null
+            });
+        }
+        else
+        {
+            foreach (var restaurant in restaurants)
+            {
+                response.Add(new ServiceResponse<string>
+                {
+
+                    Success = true,
+                    Message = "Restaurant name retrieved successfully.",
+                    Data = restaurant.RestaurantName
+
+                }
+                    );
+
+            }
+
+        }
+        return response;
+    }
+
+    public async Task<ServiceResponse<string>> UpdateUser(UserUpdateDto userUpdateDto)
+    {
+        var response = await _userRepository.GetUserByIDAsync(userUpdateDto.userID);
+        if (response == null)
+        {
+            return new ServiceResponse<string>()
+            {
+                Success = false,
+                Message = "user is not found!"
+
+            };
+        }
+
+        var User = new User
+        {
+            FullName = userUpdateDto.FullName,
+            Email = userUpdateDto.Email,
+            Phone = userUpdateDto.Phone,
+            Address = userUpdateDto.Address,
+            Username = userUpdateDto.Username,
+            Password = userUpdateDto.Password,
+
+
+
+
+        };
+
+        return new ServiceResponse<string>
+        {
+
+            Success = true,
+            Message = "user data updated successfully! your userId is same as previous"
+
+          
+        };
+} }

@@ -11,12 +11,14 @@ namespace OnlineFoodDelivery.Repository
             Task AddUserAsync(User user);
             Task UpdateUserAsync(User user);
             Task SaveChangesAsync();
+            Task<User> GetUserByIDAsync (int id);
+
 
         
             List<Restaurant> GetAllRestaurantsAsync();
             List<FoodItems> GetAllFoodItemsAsync();
 
-        Task<List<FoodCategory>> GetFoodCategoriesWithItemsAsync();
+            Task<List<FoodCategory>> GetFoodCategoriesWithItemsAsync();
 
 
 
