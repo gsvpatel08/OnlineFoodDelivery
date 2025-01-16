@@ -14,8 +14,11 @@ namespace OnlineFoodDelivery.Repository
             Task<User> GetUserByIDAsync (int id);
 
 
-        
-            List<Restaurant> GetAllRestaurantsAsync();
+            Task <User> GetUserById(int userId);
+        void UpdateUser(User user);
+
+
+        List<Restaurant> GetAllRestaurantsAsync();
             List<FoodItems> GetAllFoodItemsAsync();
 
             Task<List<FoodCategory>> GetFoodCategoriesWithItemsAsync();

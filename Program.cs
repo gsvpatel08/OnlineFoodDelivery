@@ -1,15 +1,18 @@
 using System.Reflection.Emit;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using OnlineFoodDelivery.Data;
 using OnlineFoodDelivery.model;
 using OnlineFoodDelivery.Repository;
 using OnlineFoodDelivery.Service;
 using OnlineFoodDelivery.Service.Interfaces;
 using OnlineFoodDelivery.Utility;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddDbContext<OnlineFoodDeliveryDB>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -39,6 +43,9 @@ builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
 builder.Services.AddScoped<IFoodItemsService, FoodItemService>();
 builder.Services.AddScoped<IOrderService, OrdersService>();
 builder.Services.AddScoped<IOrdersRepository, OrdersRepository>();
+builder.Services.AddAuthorization();
+
+builder.Services.AddEndpointsApiExplorer();
         
 
 
@@ -58,6 +65,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAuthorization(options =>{
+options.AddPolicy(IdentityData.AdminUserPolicyClaims, p=> p.RequireClaim(IdentityData.AdminUserPolicyClaims,"True"));
+    });
 
 var app = builder.Build();
 
@@ -69,9 +79,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
+
 
 
 app.MapControllers();

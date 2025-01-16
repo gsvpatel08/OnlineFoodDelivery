@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using OnlineFoodDelivery.Data;
 using OnlineFoodDelivery.Models.Dto;
@@ -9,6 +10,7 @@ using OnlineFoodDelivery.Service.Interfaces;
 
 namespace OnlineFoodDelivery.Controllers
 {
+    
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -29,7 +31,6 @@ namespace OnlineFoodDelivery.Controllers
 
             return Ok(response);
         }
-
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
@@ -39,7 +40,7 @@ namespace OnlineFoodDelivery.Controllers
 
             return Ok(response);
         }
-
+        [Authorize]
         [HttpPost("forgotPassword")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
@@ -49,7 +50,7 @@ namespace OnlineFoodDelivery.Controllers
 
             return Ok(response);
         }
-
+        [Authorize]
         [HttpPost("resetPassword")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
         {
@@ -86,7 +87,7 @@ namespace OnlineFoodDelivery.Controllers
             if (result.All(r => !r.Success))
             {
                 return NotFound(result.First().Message);
-                
+
             }
 
             return Ok(result.Select(r => r.Data));
@@ -107,11 +108,24 @@ namespace OnlineFoodDelivery.Controllers
 
 
 
-        [HttpPut("UpdateUser")]
-        public async Task<IActionResult> UpdateUser(UserUpdateDto userUpdateDto)
-        {
-            var response = await _userService.UpdateUser(userUpdateDto);
+        //[HttpPut("UpdateUser")]
+        //public async Task<IActionResult> UpdateUser(UserUpdateDto userUpdateDto)
+        //{
+        //    var response = await _userService.UpdateUser(userUpdateDto);
 
+        //    if (response.Success)
+        //    {
+        //        return NotFound(response);
+
+        //    }
+        //    return Ok(response);
+        //}
+
+
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto user)
+        {
+            var response = await _userService.UpdateUserAsync(id, user);
             if (response.Success)
             {
                 return NotFound(response);
@@ -119,4 +133,7 @@ namespace OnlineFoodDelivery.Controllers
             }
             return Ok(response);
         }
-    }  }
+
+
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using OnlineFoodDelivery.model;
 using OnlineFoodDelivery.Utility.Enums;
 
 namespace OnlineFoodDelivery.Module
@@ -46,10 +47,12 @@ namespace OnlineFoodDelivery.Module
 
 
         [Required]
-        public int OwnerID { get; set; }  // This column will store the foreign key
+        public int OwnerID { get; set; }  
 
-        [ForeignKey(nameof(OwnerID))]  // Maps to RestaurentOwner.OwnerID
+        [ForeignKey(nameof(OwnerID))]  
         public RestaurentOwner RestaurentOwnerId { get; set; }
+
+        public ICollection<FoodCategory> FoodCategories { get; set; }
     }
 
 }

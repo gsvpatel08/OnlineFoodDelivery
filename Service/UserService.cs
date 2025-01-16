@@ -167,7 +167,7 @@ public class UserService : IUserService
     public async Task<ServiceResponse<string>> ResetPasswordAsync(string token, string username, string newPassword)
     {
         try
-        { // Validate the token
+        { 
             var isTokenValid = await _jwtHelper.ValidateResetTokenAsync(token);
             if (!isTokenValid)
             {
@@ -178,7 +178,7 @@ public class UserService : IUserService
                 };
             }
 
-            // Retrieve the user by username
+            
             var user = await _userRepository.GetUserByUsernameAsync(username);
             if (user == null)
             {
@@ -189,7 +189,7 @@ public class UserService : IUserService
                 };
             }
 
-            // Update the user's password
+            
             user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
             await _userRepository.UpdateUserAsync(user);
             await _userRepository.SaveChangesAsync();
@@ -220,9 +220,8 @@ public class UserService : IUserService
 
         var response = new List<ServiceResponse<RestaurentFoodItemListApiResponse>>();
 
-        // Fetch all restaurants and food items
-        var restaurants = await Task.Run(() => _userRepository.GetAllRestaurantsAsync());
-        var foodItems = await Task.Run(() => _userRepository.GetAllFoodItemsAsync());
+        var restaurants = _userRepository.GetAllRestaurantsAsync();
+        var foodItems = _userRepository.GetAllFoodItemsAsync();
 
         var restaurant = restaurants.FirstOrDefault(r => r.RestaurantName == restaurantName);
 
@@ -291,7 +290,7 @@ public class UserService : IUserService
             };
         }
 
-        
+
         foreach (var category in foodCategories)
         {
             var categoryResponse = new FoodCategoryResponse
@@ -354,20 +353,56 @@ public class UserService : IUserService
         return response;
     }
 
-    public async Task<ServiceResponse<string>> UpdateUser(UserUpdateDto userUpdateDto)
+    //public async Task<ServiceResponse<string>> UpdateUser(UserUpdateDto userUpdateDto)
+    //{
+    //    var response = await _userRepository.GetUserByIDAsync(userUpdateDto.userID);
+    //    if (response == null)
+    //    {
+    //        return new ServiceResponse<string>()
+    //        {
+    //            Success = false,
+    //            Message = "user is not found!"
+
+    //        };
+    //    }
+
+    //    var User = new User
+    //    {
+    //        FullName = userUpdateDto.FullName,
+    //        Email = userUpdateDto.Email,
+    //        Phone = userUpdateDto.Phone,
+    //        Address = userUpdateDto.Address,
+    //        Username = userUpdateDto.Username,
+    //        Password = userUpdateDto.Password,
+
+
+
+
+    //    };
+
+    //    return new ServiceResponse<string>
+    //    {
+
+    //        Success = true,
+    //        Message = "user data updated successfully! your userId is same as previous"
+
+
+    //    };
+    //}
+
+    public async Task<ServiceResponse<string>> UpdateUserAsync(int userId, UserUpdateDto userUpdateDto)
     {
-        var response = await _userRepository.GetUserByIDAsync(userUpdateDto.userID);
-        if (response == null)
+        var exisitingUser = await _userRepository.GetUserByIDAsync(userId);
+        if (exisitingUser == null)
         {
             return new ServiceResponse<string>()
             {
                 Success = false,
-                Message = "user is not found!"
-
+                Message = "user not found"
             };
         }
 
-        var User = new User
+        var user = new User
         {
             FullName = userUpdateDto.FullName,
             Email = userUpdateDto.Email,
@@ -375,18 +410,13 @@ public class UserService : IUserService
             Address = userUpdateDto.Address,
             Username = userUpdateDto.Username,
             Password = userUpdateDto.Password,
-
-
-
-
         };
 
+        _userRepository.UpdateUser(user);
         return new ServiceResponse<string>
         {
-
             Success = true,
-            Message = "user data updated successfully! your userId is same as previous"
-
-          
+            Message = "user details updated succesfully!"
         };
-} }
+    }
+}

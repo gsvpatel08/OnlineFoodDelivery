@@ -8,7 +8,9 @@ namespace OnlineFoodDelivery.Service.Interfaces
         Task RegisterCategoryAsync(FoodCategory foodCategory);
         Task<List<FoodCategory>> GetFoodCategoriesAsync(); 
 
-        Task<FoodCategory> GetCategoryByCategoryNameAsync(string categoryName);
+        Task<FoodCategory> GetRestaurantINCategory(int RestaurantID);
+
+
         
 
 

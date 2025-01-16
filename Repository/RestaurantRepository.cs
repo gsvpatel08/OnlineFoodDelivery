@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineFoodDelivery.Data;
+using OnlineFoodDelivery.Models.Dto;
 using OnlineFoodDelivery.Module;
+using OnlineFoodDelivery.Utility.Enums;
 
 namespace OnlineFoodDelivery.Repository
 {
@@ -43,9 +45,38 @@ namespace OnlineFoodDelivery.Repository
             return _DbContext.Restaurant.FirstOrDefaultAsync(p => p.RestaurantPhone == phone);
         }
 
-        public Task UpdateRestaurantAsync(Restaurant Restaurant)
+        //public  async Task<List<Restaurant>> GetRestaurantsByCategoryAsync(string categoryName)
+        //{
+            
+        //        return await _DbContext.Restaurant
+        //            .Where(r => r.FoodCategories.Any(fc => fc.CategoryName == categoryName))
+        //            .ToListAsync();
+            
+        //}
+
+        public async Task<List<Restaurant>> GetRestaurantsByCategoryNameAsync(string categoryName)
         {
-            throw new NotImplementedException();
+            var restaurants = await _DbContext.Restaurant
+           .FromSqlRaw("EXEC GetRestaurantsByCategory @CategoryName = {0}", categoryName)
+           .ToListAsync();
+
+            return restaurants;
+        }
+
+        public async Task UpdateRestaurantAsync(Restaurant Restaurant)
+        {
+             _DbContext.Restaurant.Update(Restaurant);
+            await _DbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateRestaurantRatingsAsync(int restaurantId, RestaurantRatings newRating)
+        {
+            var restaurant = await GetRestaurantByIdAsync(restaurantId);
+            if (restaurant != null)
+            {
+                restaurant.restaurantRatings = newRating;
+                await _DbContext.SaveChangesAsync();
+            }
         }
     }
 }

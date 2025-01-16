@@ -45,7 +45,7 @@ namespace OnlineFoodDelivery.Service
             try
             {
 
-               var category =  await _categoryRepository.GetCategoryByCategoryNameAsync(registerCategoryDto.CategoryName);
+               var category =  await _categoryRepository.GetRestaurantINCategory(registerCategoryDto.RestaurantID);
 
                 if (category != null)
                 {

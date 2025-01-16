@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using AutoMapper;
+using MailKit.Search;
 using OnlineFoodDelivery.Models;
 using OnlineFoodDelivery.Models.Dto;
 using OnlineFoodDelivery.Repository;
@@ -22,7 +23,7 @@ namespace OnlineFoodDelivery.Service
 
         public async Task<ServiceResponse<string>> DeleteOrderAsync(OrderDeleteDto orderDeleteDto)
         {
-            var orderId =   await _ordersRepository.GetOrderByIDAsync(orderDeleteDto.Id);
+            var orderId = await _ordersRepository.GetOrderByIDAsync(orderDeleteDto.Id);
             if (orderId != null)
             {
                 await _ordersRepository.DeleteOrdersAsync(orderId);
@@ -32,7 +33,7 @@ namespace OnlineFoodDelivery.Service
                     Message = "Order is deleted successfully!"
                 };
             }
-         
+
             return new ServiceResponse<string>
             {
                 Success = false,
@@ -41,6 +42,36 @@ namespace OnlineFoodDelivery.Service
             };
         }
 
+        public async Task<List<ServiceResponse<string>>> GetOrdersByRestaurantIDAsync(int resttaurentId)
+        {
+            var response = new List<ServiceResponse<string>>();
+            var restaurant = await _ordersRepository.GetOrdersByRestaurentIdAsync(resttaurentId);
+            if (restaurant == null)
+            {
+                response.Add(new ServiceResponse<string>
+                {
+                    Success = false,
+                    Message = "Restaurant not found are else oeders not found.",
+                    Data = null
+                });
+
+                return response;
+            }
+            else
+            {
+                response.AddRange(restaurant.Select(order => new ServiceResponse<string>
+                {
+                    Success = true,
+                    Message = "Order retrieved successfully.",
+                    Data = $"Order ID: {order.OrderID}"
+                }));
+            }
+
+                return response;
+            }
+
+
+        
         public async Task<List<ServiceResponse<string>>> GetOrdersByRestaurantName(string restaurantName)
         {
             var response = new List<ServiceResponse<string>>();
@@ -48,6 +79,7 @@ namespace OnlineFoodDelivery.Service
             // Fetch all restaurants and orders
             var restaurants = await Task.Run(() => _ordersRepository.GetAllRestaurants());
             var orders = await Task.Run(() => _ordersRepository.GetAllOrders());
+          
 
             // Find the restaurant by name
             var restaurant = restaurants.FirstOrDefault(r => r.RestaurantName == restaurantName);
@@ -89,8 +121,35 @@ namespace OnlineFoodDelivery.Service
             return response;
         }
 
+        public async Task<ServiceResponse<string>> GetOrderStatusAsync(int Orderid)
 
-        
+        {
+            var response = new ServiceResponse<string>();
+
+            try
+            {
+                
+                var order = await _ordersRepository.GetOrderByIDAsync(Orderid);
+
+                if (order == null)
+                {
+                    response.Success = false;
+                    response.Message = "Order not found.";
+                    return response;
+                }
+
+                response.Success = true;
+                response.Message = "Order status retrieved successfully.";
+                response.Data = order.DeliveryStatus;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"An error occurred: {ex.Message}";
+            }
+
+            return response;
+        }
 
         public async Task<ServiceResponse<string>> RegisterOrdersAsync(PlaceOrderDto registerOrderDto)
         {

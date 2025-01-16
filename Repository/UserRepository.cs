@@ -34,14 +34,14 @@ namespace OnlineFoodDelivery.Repository
                 await _context.SaveChangesAsync();
             }
 
-            public async Task UpdateUserAsync(User user)
-            {
-                _context.User.Update(user);
+        public async Task UpdateUserAsync(User user)
+        {
+            _context.User.Update(user);
             _context.SaveChangesAsync();
 
-            }
+        }
 
-            public async Task SaveChangesAsync()
+        public async Task SaveChangesAsync()
             {
                 await _context.SaveChangesAsync();
             }
@@ -67,6 +67,23 @@ namespace OnlineFoodDelivery.Repository
         public async Task<User> GetUserByIDAsync(int id)
         {
             return  _context.User.FirstOrDefault(u => u.UserId == id);
+        }
+
+        public void UpdateUser(int userId, User updatedUser)
+        {
+            _context.User.Update(updatedUser);
+            _context.SaveChanges();
+        }
+
+        public async  Task<User> GetUserById(int userId)
+        {
+            return _context.User.FirstOrDefault(u => u.UserId == userId);
+        }
+
+        public void UpdateUser(User user)
+        {
+            _context.User.Update(user);
+            _context.SaveChanges();
         }
     }
     }

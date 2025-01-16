@@ -15,7 +15,7 @@ namespace OnlineFoodDelivery.Service
             Task<ServiceResponse<string>> ForgotPasswordAsync(string email);
             Task<ServiceResponse<string>> ResetPasswordAsync(string token, string newPassword, string username);
 
-        Task<ServiceResponse<string>> UpdateUser(UserUpdateDto userUpdateDto);
+        //Task<ServiceResponse<string>> UpdateUser(UserUpdateDto userUpdateDto);
 
 
         
@@ -24,6 +24,10 @@ namespace OnlineFoodDelivery.Service
         Task<List<ServiceResponse<FoodCategoryResponse>>> GetFoodCategoriesWithItemsAsync();
 
         Task<List<ServiceResponse<string>>> GetAllRestaurantsNamesAsync();
+
+        Task<ServiceResponse<string>> UpdateUserAsync(int userId, UserUpdateDto userUpdateDto);
+
+
     }
 
 }
